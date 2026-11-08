@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 
 from posts.models import Group, Post
-from .permissions import IsAuthorOrReadOnly
+from .permissions import IsAuthenticatedAuthorOrReadOnly
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
 
 
@@ -11,7 +11,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAuthorOrReadOnly)
+    permission_classes = (IsAuthenticatedAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
         # Автора беру из токена, а не из тела запроса.
@@ -29,7 +29,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Комментарии к посту, id которого передан в адресе."""
 
     serializer_class = CommentSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAuthorOrReadOnly)
+    permission_classes = (IsAuthenticatedAuthorOrReadOnly,)
 
     def get_post(self):
         # Если поста нет, сразу отдаю 404.
